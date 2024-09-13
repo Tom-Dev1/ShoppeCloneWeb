@@ -1,45 +1,68 @@
+import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
+import Input from 'src/components/Input'
+import { schema } from 'src/utils/rules'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { Schema } from 'yup'
 
+type FormData = Schema
 export default function Register() {
+  const {
+    register,
+    handleSubmit,
+    watch,
+    getValues,
+    formState: { errors }
+  } = useForm<FormData>({
+    resolver: yupResolver(schema)
+  })
+
+  const onSubmit = handleSubmit((data) => {
+    // const password = getValues('password')
+    console.log(data)
+  })
+  // console.log('errors', errors)
+  const value = watch()
+  console.log('value', value)
   return (
     <div className='bg-orange'>
-      <div className='max-w-7xl mx-auto px-4'>
-        <div className='grid grid-cols-1 lg:gird-cols-5 lg:py-32 py-12 lg:pr-10'>
+      <div className='container'>
+        <div className='grid grid-cols-1 lg:grid-cols-5 lg:py-32 py-12 lg:pr-10'>
           <div className='lg:col-span-2 lg:col-start-4'>
-            <form className='p-10 rounded bg-white shadow-sm'>
+            <form className='p-10 rounded bg-white shadow-sm' onSubmit={onSubmit} noValidate>
               <div className='text-2xl'>Đăng Nhập</div>
-              <div className='mt-8'>
-                <input
-                  type='email'
-                  name='email'
-                  className='p-3 w-full outline-none border border-gray-300 rounded-sm
-              focus:shadow-sm focus:border-gray-500 '
-                  placeholder='Email'
-                />
-                <div className='mt-1 text-red-600 min-h-[1rem] text-sm'>Khong hop le</div>
-              </div>
-              <div className='mt-3'>
-                <input
-                  type='password'
-                  name='password'
-                  className='p-3 w-full outline-none border border-gray-300 rounded-sm
-              focus:shadow-sm focus:border-gray-500 '
-                  placeholder='Password'
-                />
-                <div className='mt-1 text-red-600 min-h-[1rem] text-sm'>Khong hop le</div>
-              </div>
-              <div className='mt-3'>
-                <input
-                  type='password'
-                  name='confirm_password'
-                  className='p-3 w-full outline-none border border-gray-300 rounded-sm
-              focus:shadow-sm focus:border-gray-500 '
-                  placeholder='Confirm Password'
-                />
-                <div className='mt-1 text-red-600 min-h-[1rem] text-sm'>Khong hop le</div>
-              </div>
-              <div className='mt-3'>
-                <button className='w-full text-center py-4 px-2 uppercase bg-red-500 text-white text-sm hover:bg-red-600'>
+              <Input
+                name='email'
+                register={register}
+                type='email'
+                className='mt-8'
+                errorMessage={errors.email?.message}
+                placeholder='Email'
+              />
+              <Input
+                name='password'
+                register={register}
+                type='password'
+                className='mt-2'
+                errorMessage={errors.password?.message}
+                placeholder='Password'
+                autoComplete='on'
+              />
+              <Input
+                name='confirm_password'
+                register={register}
+                type='password'
+                className='mt-2'
+                errorMessage={errors.confirm_password?.message}
+                placeholder='Password'
+                autoComplete='on'
+              />
+
+              <div className='mt-2'>
+                <button
+                  type='submit'
+                  className='w-full text-center py-4 px-2 uppercase bg-red-500 text-white text-sm hover:bg-red-600'
+                >
                   Đăng Ký
                 </button>
               </div>
