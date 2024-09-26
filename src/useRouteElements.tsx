@@ -32,5 +32,5 @@ export default function useRouteElements() {
       )
     }
   ])
-  return routeElements // return the routes for use in your app  // or return the routeElements directly in your App.tsx file if you prefer.  // This is just an example. You can modify this according to your needs.  // For example, you could have a separate component for each route and return those components instead.  // For a complete solution, you may want to consider using a routing library like React Router or Next.js.  // For simplicity, this example
+  return routeElements // return the routes for use  app
 }
