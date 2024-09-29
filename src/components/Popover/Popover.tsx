@@ -13,7 +13,8 @@ export default function Popover({ children, className, renderPopover, as: Elemen
   const [isOpen, setIsOpen] = useState(initiaOpen || false)
   const arrowRef = useRef<HTMLElement>(null)
   const { x, y, reference, floating, strategy, middlewareData } = useFloating({
-    middleware: [offset(6), shift(), arrow({ element: arrowRef })]
+    middleware: [offset(6), shift(), arrow({ element: arrowRef })],
+    placement: 'bottom-end'
   })
   const id = useId()
   const showPopover = () => {
