@@ -1,16 +1,21 @@
 import { useForm } from 'react-hook-form'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Schema, schema } from 'src/utils/rules'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useMutation } from '@tanstack/react-query'
 import Input from 'src/components/Input'
 import { registerAccount } from 'src/apis/auth.api'
 import { Omit, omit } from 'lodash'
-import { ResponseAPI } from 'src/types/utils.type'
+import { ErrorResponseAPI } from 'src/types/utils.type'
 import { isAxiosUnprocessableEntityError } from 'src/utils/utils'
+import { useContext } from 'react'
+import { AppContext } from 'src/contexts/app.context'
+import Button from 'src/components/Button'
 
 type FormData = Schema
 export default function Register() {
+  const { setIsAuthenticated, setProfile } = useContext(AppContext)
+  const navigate = useNavigate()
   const {
     register,
     handleSubmit,
@@ -30,12 +35,12 @@ export default function Register() {
     const body = omit(data, ['confirm_password'])
     registerAccountMutation.mutate(body, {
       onSuccess: (data) => {
-        console.log(data)
-        // Redirect to home page
-        // history.push('/')
+        setIsAuthenticated(true)
+        setProfile(data.data.data.user)
+        navigate('/')
       },
       onError: (error) => {
-        if (isAxiosUnprocessableEntityError<ResponseAPI<Omit<FormData, 'confirm_password'>>>(error)) {
+        if (isAxiosUnprocessableEntityError<ErrorResponseAPI<Omit<FormData, 'confirm_password'>>>(error)) {
           const formErrors = error.response?.data.data
           // Option 2
           if (formErrors) {
@@ -57,18 +62,15 @@ export default function Register() {
         }
       }
     })
-    console.log(data)
   })
-  // console.log('errors', errors)
-  // const value = watch()
-  // console.log('value', value)
+
   return (
     <div className='bg-orange'>
       <div className='container'>
         <div className='grid grid-cols-1 lg:grid-cols-5 lg:py-32 py-12 lg:pr-10'>
           <div className='lg:col-span-2 lg:col-start-4'>
             <form className='p-10 rounded bg-white shadow-sm' onSubmit={onSubmit} noValidate>
-              <div className='text-2xl'>Đăng Nhập</div>
+              <div className='text-2xl'>Đăng Ký</div>
               <Input
                 name='email'
                 register={register}
@@ -97,12 +99,14 @@ export default function Register() {
               />
 
               <div className='mt-2'>
-                <button
+                <Button
                   type='submit'
-                  className='w-full text-center py-4 px-2 uppercase bg-red-500 text-white text-sm hover:bg-red-600'
+                  className='w-full text-center py-4 px-2 uppercase bg-red-500 text-white text-sm hover:bg-red-600 flex justify-center items-center'
+                  isLoading={registerAccountMutation.isPending}
+                  disabled={registerAccountMutation.isPending}
                 >
                   Đăng Ký
-                </button>
+                </Button>
               </div>
               <div className='mt-8 text-center'>
                 <div className='flex items-center justify-center'>

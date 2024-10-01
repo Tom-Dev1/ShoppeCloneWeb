@@ -1,16 +1,21 @@
 import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { loginAccount } from 'src/apis/auth.api'
-import { ResponseAPI } from 'src/types/utils.type'
+import { ErrorResponseAPI } from 'src/types/utils.type'
 import { Schema, schema } from 'src/utils/rules'
 import { isAxiosUnprocessableEntityError } from 'src/utils/utils'
 import { yupResolver } from '@hookform/resolvers/yup'
 import Input from 'src/components/Input'
+import { useContext } from 'react'
+import { AppContext } from 'src/contexts/app.context'
+import Button from 'src/components/Button'
 
 type FormData = Omit<Schema, 'confirm_password'>
 const loginSchema = schema.omit(['confirm_password'])
 export default function Login() {
+  const { setIsAuthenticated, setProfile } = useContext(AppContext)
+  const navigate = useNavigate()
   const {
     register,
     handleSubmit,
@@ -27,12 +32,12 @@ export default function Login() {
   const onSubmit = handleSubmit((data) => {
     loginAccountMutation.mutate(data, {
       onSuccess: (data) => {
-        console.log(data)
-        // Redirect to home page
-        // history.push('/')
+        setIsAuthenticated(true)
+        setProfile(data.data.data.user)
+        navigate('/')
       },
       onError: (error) => {
-        if (isAxiosUnprocessableEntityError<ResponseAPI<FormData>>(error)) {
+        if (isAxiosUnprocessableEntityError<ErrorResponseAPI<FormData>>(error)) {
           const formErrors = error.response?.data.data
           if (formErrors) {
             Object.keys(formErrors).forEach((key) => {
@@ -45,10 +50,7 @@ export default function Login() {
         }
       }
     })
-    console.log(data)
   })
-  const values = watch()
-  console.log(values, errors)
 
   return (
     <div className='bg-orange'>
@@ -75,9 +77,14 @@ export default function Login() {
                 autoComplete='on'
               />
               <div className='mt-3'>
-                <button className='w-full text-center py-4 px-2 uppercase bg-red-500 text-white text-sm hover:bg-red-600'>
+                <Button
+                  type='submit'
+                  className='w-full text-center py-4 px-2 uppercase bg-red-500 text-white text-sm hover:bg-red-600 flex justify-center items-center'
+                  isLoading={loginAccountMutation.isPending}
+                  disabled={loginAccountMutation.isPending}
+                >
                   Đăng nhập
-                </button>
+                </Button>
               </div>
               <div className='mt-8 text-center'>
                 <div className='flex items-center justify-center'>
